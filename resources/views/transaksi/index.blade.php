@@ -62,8 +62,14 @@
                         <td>{{ $transaksi->no_telepon }}</td>
                         <td>{{ $transaksi->lokasi}}</td>
                         <td>{{ $transaksi->kuantiti}}</td>
-                        <td style='font-weight: bold'>{{ $transaksi->total}}</td>
-                        <td><span class="badge bg-success">{{ $transaksi->status}}</span></td>
+                        <td style='font-weight: bold'>Rp. {{ $transaksi->total}}</td>
+                        <td>
+                            @if($transaksi->status == "PAID")
+                                <span class="badge bg-success">PAID</span></td>
+                            @elseif($transaksi->status == "PENDING")
+                                <span class="badge bg-secondary">PENDING</span></td>
+                            @endif
+                        </td>
                         
                         {{-- <td align="center" >
                             <a href="{{ URL('transaksi/edit/'. $transaksi->id_transaksi) }}" class="btn btn-success">Edit</a>

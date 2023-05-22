@@ -128,8 +128,8 @@
                           <div class="row">
                               <div class="col-sm-12">
                                 <select class="form-control" name='biaya_admin'>
-                                  <option value='1000'>e-Wallet atau QRIS | Biaya Admin Rp. 1000</option>
-                                  <option value='4000'>Bank (Virtual Account) atau Outlet | Biaya Admin Rp. 4000</option>
+                                  <option value='Approved'>Disetujui / Approved</option>
+                                  <option value='Denied'>Ditolak / Denied</option>
                                 </select>
                               </div>
                           </div>

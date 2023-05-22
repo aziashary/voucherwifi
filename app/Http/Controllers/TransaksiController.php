@@ -80,7 +80,7 @@ class TransaksiController extends Controller
                     'email'
                 ]
             ],
-            'success_redirect_url' => 'https://6bda-180-252-168-239.ap.ngrok.io/bayar/showvoucher/'.$external_id,
+            'success_redirect_url' => 'https://adef-110-137-194-136.ngrok-free.app/bayar/showvoucher/'.$external_id,
             'failure_redirect_url' => 'https://6bda-180-252-168-239.ap.ngrok.io/',
         ]);
         $response = $data_request->object();

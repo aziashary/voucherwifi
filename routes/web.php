@@ -57,7 +57,7 @@ Route::get('/used', [PaketController::class, 'used']);
 
 // Transaksi
     Route::group(['prefix' => 'transaksi'], function () {
-Route::get('/index', [VoucherController::class, 'index']);
+Route::get('/', [TransaksiController::class, 'index']);
 
     });
 

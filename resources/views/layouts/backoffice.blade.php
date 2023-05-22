@@ -74,7 +74,7 @@
                         <a href="{{ url('voucher/') }}">Uang Masuk</a>
                     </li>
                     <li class="submenu-item ">
-                        <a href="{{ url('voucher/used') }}">Riwayat Transaksi</a>
+                        <a href="{{ url('transaksi/') }}">Riwayat Transaksi</a>
                     </li>
                 </ul>
             </li>
