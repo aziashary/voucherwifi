@@ -128,8 +128,8 @@
                           <div class="row">
                               <div class="col-sm-12">
                                 <select class="form-control" name='biaya_admin'>
-                                  <option value='Approved'>Disetujui / Approved</option>
-                                  <option value='Denied'>Ditolak / Denied</option>
+                                  <option value='4000'>Transfer VA</option>
+                                  <option value='500'>e-Wallet dan QRIS</option>
                                 </select>
                               </div>
                           </div>
