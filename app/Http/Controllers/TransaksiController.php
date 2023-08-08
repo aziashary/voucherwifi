@@ -51,6 +51,13 @@ class TransaksiController extends Controller
         $external_id = 'Qnsi-'.Str::random(10);
         $total = $harga * $request->kuantiti;
         $biaya_admin = $request->biaya_admin;
+        $eWalletMethod = 'SHOPEEPAY'; // Misalnya: 'GO_PAY', 'OVO', 'DANA', dll.
+        $eWalletInfo = [
+            'ewallet_type' => $eWalletMethod,
+            'phone' => $request->no_whatsapp, // Nomor telepon yang terkait dengan e-wallet
+            // Jika menggunakan OVO, Anda mungkin membutuhkan informasi tambahan, seperti "ovo_id"
+            // 'ovo_id' => $request->input('ovo_id'),
+        ];
             
         
         // Http request ke xendit
@@ -59,6 +66,8 @@ class TransaksiController extends Controller
         ])->post('https://api.xendit.co/v2/invoices', [
             'external_id' => $external_id,
             'amount' => $total + $biaya_admin,
+            'payment_method' => $eWalletMethod, // Menggunakan metode pembayaran e-wallet yang telah dipilih
+            'ewallet_info' => $eWalletInfo, // Informasi e-wallet
             'customer' => [
                 'email' => $request->email,
                 'mobile_number' => $request->no_whatsapp,
