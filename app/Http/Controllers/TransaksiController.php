@@ -20,13 +20,76 @@ class TransaksiController extends Controller
     return view('transaksi.index', compact('data'));
     }
 
+    public function filter(Request $request)
+    {
+        // Ambil data dari request
+        $paketFilter = $request->input('paket');
+        $lokasiFilter = $request->input('lokasi');
+        $status = $request->input('status');
+        $metode = $request->input('metode');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // Query berdasarkan filter
+        $query = Transaksi::query();
+
+        if ($paketFilter) {
+            $query->whereIn('paket', $paketFilter);
+        }
+
+        if ($lokasiFilter) {
+            $query->whereIn('lokasi', $lokasiFilter);
+        }
+
+        if ($status) {
+            $query->whereIn('status', $status);
+        }
+
+        if ($metode) {
+            $query->whereIn('payment_method', $metode);
+        }
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        // Ambil data setelah difilter
+        $data = $query->orderby('id_transaksi','ASC')->get();
+        return view('transaksi.index', compact('data'));
+    }
+
     public function create()
     {
         $data = Paket::orderby('id_paket','ASC')->get();
         return view('transaksi.index', compact('data'));
     }
 
-    public function store(Request $request, $lokasi)
+    public function getDetailData($id)
+{
+    // Gantilah ini dengan logika untuk mengambil data dari database
+    $data = Transaksi::where('id_transaksi', $id)->with('hargas')->first();
+
+        return response()->json([
+            'kodetransaksi' => $data->kode_transaksi,
+            'email' => $data->email,
+            'no_telepon' => $data->no_telepon,
+            'tanggal' => $data->created_at,
+            'paket' => $data->paket,
+            'harga' => $data->hargas->harga,
+            'kuantiti' =>  $data->kuantiti,
+            'subtotal' => $data->hargas->harga * $data->kuantiti,
+            'biaya_admin' => $data->biaya_admin,
+            'status' => $data->status,
+            'total' => $data->total,
+            'metode' => $data->payment_method
+
+
+
+        ]); 
+}
+
+
+    protected function store(Request $request, $lokasi)
     {
         // Captcha
         // $validate_captcha = NoCaptcha::verifyResponse($request->input('g-recaptcha-response'));
@@ -72,25 +135,25 @@ class TransaksiController extends Controller
                 'email' => $request->email,
                 'mobile_number' => $request->no_whatsapp,
             ],
-            'customer_notification_preference' => [
-                'invoice_created' => [
-                    'whatsapp',
-                    'sms',
-                    'email'
-                ],
-                'invoice_paid' => [
-                    'whatsapp',
-                    'sms',
-                    'email'
-                ],
-                'invoice_expired' => [
-                    'whatsapp',
-                    'sms',
-                    'email'
-                ]
-            ],
-            'success_redirect_url' => 'https://adef-110-137-194-136.ngrok-free.app/bayar/showvoucher/'.$external_id,
-            'failure_redirect_url' => 'https://6bda-180-252-168-239.ap.ngrok.io/',
+            // 'customer_notification_preference' => [
+            //     'invoice_created' => [
+            //         'whatsapp',
+            //         'sms',
+            //         'email'
+            //     ],
+            //     'invoice_paid' => [
+            //         'whatsapp',
+            //         'sms',
+            //         'email'
+            //     ],
+            //     'invoice_expired' => [
+            //         'whatsapp',
+            //         'sms',
+            //         'email'
+            //     ]
+            // ],
+            'success_redirect_url' => 'https://4a1d-110-137-192-14.ngrok-free.app/bayar/showvoucher/'.$external_id,
+            'failure_redirect_url' => 'https://4a1d-110-137-192-14.ngrok-free.app/',
         ]);
         $response = $data_request->object();
 
@@ -107,19 +170,55 @@ class TransaksiController extends Controller
             'payment_link' => $response->invoice_url,
             'total' => $total + $biaya_admin
         ]);
+        if ($store){
+
+            $voucher = Voucher::where('lokasi','=',$lokasi)
+                    ->where('paket','=', $request->paket)
+                    ->where('status_voucher','=', 'Available')
+                    ->distinct() // Gunakan DISTINCT untuk memastikan hasil unik
+                    ->orderBy('id_voucher', 'ASC')
+                    ->limit($request->kuantiti)
+                    ->get();
+
+                            if ($voucher->isEmpty()) {
+                                return redirect()->back()->withErrors(['No vouchers found']);
+                            }
+                
+                foreach($voucher as $rows){
+                Pesanan::create([
+                    'kode_transaksi' => $external_id,
+                    'lokasi' => $rows->lokasi,
+                    'kode_voucher' => $rows->kode_voucher,
+                    'status_voucher' => 'Pending',
+                    'paket' => $rows->paket,
+                    'durasi' => $rows->hargas->durasi,
+                    'harga' => $rows->hargas->harga
+                ]);
+
+                Voucher::where('kode_voucher', $rows->kode_voucher)
+                        ->update([
+                            'status_voucher' => 'Pending',
+                        ]);
+                }
+            }else{
+                return redirect()->back()->with('error_source', 'pesanan');
+        }
+            if($voucher){
                 return redirect('bayar/proses/'.$external_id);
-           
+            }else{
+                return back();
+            }    
         }
     }
 
-    public function proses($kode_transaksi)
+    protected function proses($kode_transaksi)
     {
         $item = Transaksi::where('kode_transaksi', $kode_transaksi)->with('hargas')->first();
         $data = Transaksi::where('kode_transaksi', $kode_transaksi)->with('hargas')->get();
         return view('payment.bayar', compact('data','item'));
     }
 
-    public function callback(Request $request){
+    protected function callback(Request $request){
         $external_id = $request->external_id;
         $status = $request->status;
         // $transaksi = Transaksi::where('kode_transaksi', $external_id)->with('hargas')->get();
@@ -132,35 +231,49 @@ class TransaksiController extends Controller
                     'payment_method' => $request->payment_channel
                 ]);
 
-            $transaksi = Transaksi::where('kode_transaksi', $external_id)->first();
+            // $transaksi = Transaksi::where('kode_transaksi', $external_id)->first();
 
-            $voucher = Voucher::join('transaksi', 'transaksi.paket', '=', 'voucher.paket')
-                    ->join('paket', 'paket.paket','=', 'voucher.paket')
-                    ->where('transaksi.lokasi','=', $transaksi->lokasi)
-                    ->where('transaksi.paket','=', $transaksi->paket)
-                    ->where('voucher.status_voucher','=', 'Available')
-                    ->orderby('voucher.id_voucher', 'ASC')
-                    ->limit($transaksi->kuantiti)->get();
+            // $voucher = Voucher::join('transaksi', 'transaksi.paket', '=', 'voucher.paket')
+            //         ->join('paket', 'paket.paket','=', 'voucher.paket')
+            //         ->where('transaksi.lokasi','=', $transaksi->lokasi)
+            //         ->where('transaksi.paket','=', $transaksi->paket)
+            //         ->where('voucher.status_voucher','=', 'Available')
+            //         ->orderby('voucher.id_voucher', 'ASC')
+            //         ->limit($transaksi->kuantiti)->get();
 
-                            if ($voucher->isEmpty()) {
-                                return redirect()->back()->withErrors(['No vouchers found']);
-                            }
+            //                 if ($voucher->isEmpty()) {
+            //                     return redirect()->back()->withErrors(['No vouchers found']);
+            //                 }
                 
-                foreach($voucher as $rows){
-                Pesanan::create([
-                    'kode_transaksi' => $external_id,
-                    'lokasi' => $rows->lokasi,
-                    'kode_voucher' => $rows->kode_voucher,
-                    'paket' => $rows->paket,
-                    'durasi' => $rows->durasi,
-                    'harga' => $rows->harga
-                ]);
+            //     foreach($voucher as $rows){
+            //     Pesanan::create([
+            //         'kode_transaksi' => $external_id,
+            //         'lokasi' => $rows->lokasi,
+            //         'kode_voucher' => $rows->kode_voucher,
+            //         'paket' => $rows->paket,
+            //         'durasi' => $rows->durasi,
+            //         'harga' => $rows->harga
+            //     ]);
 
-                Voucher::where('kode_voucher', $rows->kode_voucher)
+            //     Voucher::where('kode_voucher', $rows->kode_voucher)
+            //             ->update([
+            //                 'status_voucher' => 'Expired',
+            //             ]);
+            //     }
+
+            $voucher = Pesanan::where('kode_transaksi', $external_id)->get();
+
+                foreach($voucher as $rows){
+                    Voucher::where('kode_voucher', $rows->kode_voucher)
                         ->update([
                             'status_voucher' => 'Expired',
                         ]);
-                }
+                    
+                    Pesanan::where('kode_voucher', $rows->kode_voucher)
+                    ->update([
+                        'status_voucher' => 'Expired',
+                        ]);
+                    }
             }else{
                 return response()->json([
                     'message' => 'Data Tidak Ada'

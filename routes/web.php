@@ -21,13 +21,13 @@ Route::get('/', function () {
     return view('menu.index');
 });
 
-Route::get('/backoffice', function () {
-    return view('dashboard');
-});
+// Route::get('/backoffice', function () {
+//     return view('dashboard');
+// });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth'])->name('dashboard');
 
 // Checkout
     Route::group(['prefix' => 'bayar'], function () {
@@ -43,26 +43,48 @@ Route::get('/{lokasi}', [MenuController::class, 'menu']);
 Route::get('/checkout/{paket}/{lokasi}', [MenuController::class, 'checkout']);
     });
 
+// Filter
+Route::get('/filter/endpoint', [VoucherController::class, 'filterdata']);
+
+
+
+Route::group(['prefix' => 'adminvoucher', 'middleware' => 'auth'], function () {
+Route::get('/', function () {
+    return view('dashboard');
+    });
+
+// Transaksi Data
+Route::get('/get-detail-data/{id}', [TransaksiController::class, 'getDetailData']);
+
 // Voucher 
     Route::group(['prefix' => 'voucher'], function () {
-Route::get('/', [VoucherController::class, 'index']);
-Route::get('/used', [VoucherController::class, 'used']);
+Route::get('/', [VoucherController::class, 'index'])->name('voucher');
+Route::post('/filter', [VoucherController::class, 'filter']);
+Route::post('/filterused', [VoucherController::class, 'filterused']);
+Route::get('/used', [VoucherController::class, 'used'])->name('voucher_used');
+Route::post('/store', [VoucherController::class, 'store']);
+Route::post('/upload', [VoucherController::class, 'upload'])->name('upload.excel');
+Route::get('/download', [VoucherController::class, 'download']);
+Route::get('/delete/{id_voucher}', [VoucherController::class, 'delete']);
+
     });
 
 // Paket
     Route::group(['prefix' => 'paket'], function () {
-Route::get('/', [PaketController::class, 'index']);
-Route::get('/used', [PaketController::class, 'used']);
+Route::get('/', [PaketController::class, 'index'])->name('paket');
+Route::post('/store', [PaketController::class, 'store']);
+Route::get('/delete/{id_voucher}', [PaketController::class, 'delete']);
     });
 
 // Transaksi
     Route::group(['prefix' => 'transaksi'], function () {
-Route::get('/', [TransaksiController::class, 'index']);
-
+Route::get('/', [TransaksiController::class, 'index'])->name('transaksi');
+Route::post('/filter', [TransaksiController::class, 'filter']);
     });
+});
 
 require __DIR__.'/auth.php';
 
-Auth::routes();
+// Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

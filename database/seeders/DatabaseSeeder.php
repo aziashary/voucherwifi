@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(UsersTableSeeder::class);
         $this->call(PaketTableSeeder::class);
-        \App\Models\Voucher::factory()->times(5000)->create();
+        $this->call(LokasiTableSeeder::class);
+        \App\Models\Voucher::factory()->times(1000)->create();
     }
 }

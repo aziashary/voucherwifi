@@ -13,6 +13,7 @@ class Pesanan extends Model
     protected $fillable = [
         'kode_transaksi',
         'lokasi',
+        'status_voucher',
         'kode_voucher',
         'paket',
         'durasi',

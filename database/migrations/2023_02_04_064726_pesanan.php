@@ -16,8 +16,9 @@ class Pesanan extends Migration
         Schema::create('pesanan', function (Blueprint $table) {
             $table->bigIncrements('id_pesanan');
             $table->string('kode_transaksi');
-            $table->string('kode_voucher');
+            $table->string('kode_voucher')->unique();
             $table->string('lokasi');
+            $table->string('status_voucher');
             $table->string('paket');
             $table->string('durasi');
             $table->string('harga');

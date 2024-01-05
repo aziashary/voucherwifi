@@ -18,6 +18,9 @@
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^3.4",
+        "livewire/livewire": "*",
+        "maatwebsite/excel": "*",
+        "rappasoft/laravel-livewire-tables": "*",
         "xendit/xendit-php": "^2.19"
     },
     "require-dev": {

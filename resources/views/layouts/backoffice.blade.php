@@ -12,6 +12,9 @@
     <link rel="shortcut icon" href="{{ asset ('assets/images/logo/logo.png')}}" type="image/png">
     
 <link rel="stylesheet" href="{{ asset ('assets/css/shared/iconly.css') }}">
+<style>
+    [x-cloak] { display: none !important; }
+</style>
 @stack('css')
 </head>
 
@@ -31,7 +34,7 @@
         <ul class="menu">
             <li
                 class="sidebar-item">
-                <a href="{{ url('/') }}" class='sidebar-link'>
+                <a href="{{ url('/adminvoucher') }}" class='sidebar-link'>
                     <i class="bi bi-grid-fill"></i>
                     <span>Dashboard</span>
                 </a>
@@ -47,17 +50,17 @@
                 </a>
                 <ul class="submenu ">
                     <li class="submenu-item ">
-                        <a href="{{ url('voucher/') }}">Voucher Tersedia</a>
+                        <a href="{{ url('adminvoucher/voucher/') }}">Voucher Tersedia</a>
                     </li>
                     <li class="submenu-item ">
-                        <a href="{{ url('voucher/used') }}">Voucher Terpakai</a>
+                        <a href="{{ url('adminvoucher/voucher/used') }}">Voucher Terpakai</a>
                     </li>
                 </ul>
             </li>
 
             <li
                 class="sidebar-item">
-                <a href="{{ url('/paket') }}" class='sidebar-link'>
+                <a href="{{ url('adminvoucher/paket') }}" class='sidebar-link'>
                     <i class="bi bi-grid-fill"></i>
                     <span>Paket</span>
                 </a>
@@ -74,7 +77,7 @@
                         <a href="{{ url('voucher/') }}">Uang Masuk</a>
                     </li>
                     <li class="submenu-item ">
-                        <a href="{{ url('transaksi/') }}">Riwayat Transaksi</a>
+                        <a href="{{ url('adminvoucher/transaksi/') }}">Riwayat Transaksi</a>
                     </li>
                 </ul>
             </li>

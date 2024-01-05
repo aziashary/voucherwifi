@@ -35,7 +35,11 @@
                       {{-- form error --}}
                       @if (session('error_source') === 'stok')
                       <div class="alert alert-danger">
-                        <strong>Stok Kurang!</strong> Pesan sesuai dengan stok yang tersedia.
+                        <strong>Stok Tidak Sesuai!</strong> Pesan sesuai dengan stok yang tersedia.
+                      </div>
+                      @elseif (session('error_source') === 'pesanan')
+                      <div class="alert alert-danger">
+                        <strong>Telah terjadi kesalahan!</strong> Harap coba kembali beberapa saat lagi.
                       </div>
                       @elseif (session('error_source') === 'captcha')
                       <div class="alert alert-danger">

@@ -25,11 +25,12 @@ class VoucherFactory extends Factory
     public function definition()
     {
         return [
-            'lokasi' => $this->faker->randomElement(['GRD.NET','Permataasri.net','Mandala.net','NDD.NET']),
+            'lokasi' => $this->faker->randomElement(['GRD.NET','PERMATAASRI.NET','MANDALA.NET','NDD.NET']),
             // 'lokasi' => 'GRD.NET',
             'kode_voucher' => str::random(10),
             'paket' => $this->faker->randomElement(['3J','5J','1H','7H','1B']),
-            'status_voucher' => $this->faker->randomElement(['Available','Active','Expired'])
+            // 'status_voucher' => $this->faker->randomElement(['Available','Pending','Expired'])
+            'status_voucher' => 'Available'
         ];
     }
 }
